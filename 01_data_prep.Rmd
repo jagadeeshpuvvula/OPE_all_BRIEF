@@ -1,0 +1,53 @@
+---
+title: "01_data_prep"
+author: "Jagadeesh Puvvula"
+date: "2025-07-15"
+output: pdf_document
+---
+
+#longitudinal BRIEF outcome data
+```{r}
+brief_df<- haven::read_sas("~/Documents/data/outcomes.sas7bdat") |>
+  select(1,2, starts_with("BRIEF")) |>
+  clean_names() |>
+  filter(!if_all(3:19, is.na)) |>
+  select(c(1,2,3,4,5,6,7,8,9,13,14,19))
+```
+
+```{r}
+brief_df |> 
+  select(subject_id, visit, 3:12) |> 
+  pivot_longer(
+    cols = 3:12,
+    names_to = "variable",
+    values_to = "value"
+  ) |> 
+  ggplot(aes(x = visit, y = value, color = variable, group = interaction(subject_id, variable))) +
+  geom_line(alpha = 0.3) +       # lines per participant, light
+  stat_summary(
+    aes(group = variable),
+    fun = mean,
+    geom = "line",
+    linewidth = 1.5
+  ) +                            # mean trend lines per variable
+  stat_summary(
+    aes(group = variable),
+    fun.data = mean_se,
+    geom = "errorbar",
+    width = 0.1
+  ) +                            # error bars around mean
+  facet_wrap(.~variable)+
+  scale_x_discrete() +
+  labs(
+    title = "",
+    x = "Visit ",
+    y = "BRIEF score",
+    color = "Variable"
+  ) +
+  theme_minimal()+
+  theme(
+    legend.position = "none"
+  )
+
+```
+

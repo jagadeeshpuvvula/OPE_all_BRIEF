@@ -1,0 +1,12 @@
+---
+title: "00_env_int"
+author: "Jagadeesh Puvvula"
+date: "2025-07-15"
+output: pdf_document
+---
+
+```{r}
+pacman::p_load(tidyverse, janitor, haven)
+```
+
+
